@@ -100,21 +100,18 @@ def homepage():
     st.title("Insurance Charges Dashboard")
     st.markdown("Analyze and visualize insurance charges data.")
     
-    raw_styled = raw.style.set_table_styles(style_data())
-
     st.write("Insurance Charges Dataset Overview",)
-    st.dataframe(round(raw_styled.head(), 2), use_container_width=True)
+    st.dataframe(round(raw.head(), 2), use_container_width=True)
 
     st.subheader("Dataset Summary Statistics")
-    st.dataframe(round(raw_styled.drop(columns=['children']).describe(), 2), use_container_width=True)
-
+    st.dataframe(round(raw.drop(columns=['children']).describe(), 2), use_container_width=True)
 
     #drop box to draw feature vs charges plot
 
     st.subheader("Relationship between each feature and charges")
     feature_selected = st.selectbox("Select Feature for Visualization", df.columns.drop('charges'))
      
-    
+     
     fig1, ax1 = plt.subplots(figsize = (7, 4))
     ax1.set_title(f"Charges vs {feature_selected}")
     ax1.set_xlabel(feature_selected)
