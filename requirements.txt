@@ -1,0 +1,6 @@
+#requirements.txt
+streamlit==1.50.0  # Already installed, good practice to list
+pandas==2.3.3      # Already installed
+numpy==2.3.4       # Already installed
+altair==5.5.0      # Already installed
+scikit-learn       # ADD THIS LINE to fix the ModuleNotFoundError
