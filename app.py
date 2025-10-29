@@ -400,8 +400,7 @@ with st.spinner("Generating visualizations..."):
         def slider_metrics():
             st.subheader("Select number of folds (K) to see CV metrics")
             K_value = st.slider("select number of folds (K)", min_value=2, max_value=15, value=5, step=1)
-            metric_values = pd.DataFrame(n_fold_cross_validation(selected_model, K_value))
-            metric_values = metric_values.style.set_table_styles(style_data())
+            metric_values = n_fold_cross_validation(selected_model, K_value)
             st.dataframe({
                 'Metric':['RMSE', 'MAPE', 'R2 Score'],
                 'Value' :[round(metric_values[0], 2), round(metric_values[1], 2), round(metric_values[2], 4)],
