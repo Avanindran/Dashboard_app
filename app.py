@@ -21,9 +21,37 @@ import streamlit as st
 #page config
 st.set_page_config( 
     page_title="Insurance Charges Dashboard",
-    page_icon="💰",
+    page_icon="📊", 
     layout="wide"
     )
+
+#styling tables
+def style_data():
+    return [
+        {   #body
+            'selector': 'td',
+            'props': [
+                ('font-family', 'Roboto, sans-serif'), 
+                ('font-size', '14px'),                 
+                ('background-color', '#282C34'),       
+                ('color', '#E0E0E0')                  
+            ]
+        },
+        {
+            #headers
+            'selector': 'th',
+            'props': [
+                ('font-family', 'Roboto, sans-serif'), 
+                ('font-size', '16px'),                  
+                ('background-color', '#1C1E21'),        
+                ('color', '#00BCD4'),                   
+                ('border', '1px solid #00BCD4')          
+            ]
+        }
+    ]
+
+
+
 
 @st.cache_data
 def load_data():
@@ -68,14 +96,17 @@ with st.sidebar:
 #Homepage 
 
 def homepage():
+    
     st.title("Insurance Charges Dashboard")
     st.markdown("Analyze and visualize insurance charges data.")
     
+    raw_styled = raw.style.set_table_styles(style_data())
+
     st.write("Insurance Charges Dataset Overview",)
-    st.dataframe(round(raw.head(), 2), use_container_width=True)
+    st.dataframe(round(raw_styled.head(), 2), use_container_width=True)
 
     st.subheader("Dataset Summary Statistics")
-    st.dataframe(round(raw.drop(columns=['children']).describe(), 2), use_container_width=True)
+    st.dataframe(round(raw_styled.drop(columns=['children']).describe(), 2), use_container_width=True)
 
 
     #drop box to draw feature vs charges plot
@@ -373,7 +404,7 @@ with st.spinner("Generating visualizations..."):
             st.dataframe({
                 'Metric':['RMSE', 'MAPE', 'R2 Score'],
                 'Value' :[round(metric_values[0], 2), round(metric_values[1], 2), round(metric_values[2], 4)],
-            }, use_container_width=True)
+            }, use_container_width=True).style.set_table_styles(style_data())
 
         slider_metrics()
     
