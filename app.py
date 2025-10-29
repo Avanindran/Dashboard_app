@@ -17,7 +17,8 @@ import seaborn as sns
 import streamlit as st
 
 
-#page configuration
+
+#page config
 st.set_page_config( 
     page_title="Insurance Charges Dashboard",
     page_icon="💰",
@@ -28,7 +29,7 @@ st.set_page_config(
 def load_data():
     data = pd.read_csv("medical insurance.csv")
     
-    # Preprocess data
+    #Preprocess data
     data['sex'] = pd.factorize(data['sex'])[0]
     data['smoker'] = pd.factorize(data['smoker'])[0]
     data['region'] = pd.factorize(data['region'])[0]
