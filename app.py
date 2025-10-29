@@ -115,7 +115,6 @@ def homepage():
 #Pair-wise plots Page
 @st.cache_data
 def pairwise_plots():
-    col1, col2, col3, col4 = st.columns(4)
     data = raw
     PLOT_HEIGHT = 2.0
     st.subheader("Figure 1: Pairwise Relationships Hued by SMOKER Status ")

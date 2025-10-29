@@ -7,4 +7,3 @@ scikit-learn       #
 plotly==5.17.0     # Already installed
 matplotlib
 seaborn
-streamlit
