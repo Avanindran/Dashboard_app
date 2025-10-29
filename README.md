@@ -1,20 +1,23 @@
-# ML model visualisation dashboard
-A Streamlit dashboard which predicts insurance charges based on given demographic data
+
+
+# 📈 ML Insurance Charges Prediction Dashboard
+A comprehensive Streamlit dashboard designed to analyse insurance charge data, visualise key feature relationships, and evaluate various Machine Learning models for predicting individual medical costs.
 
 # Dependencies required
 Standard Python libraries for data analysis and visualisation (refer to the requirements.txt file)
 
 # Homepage
-Exploratory data analysis and visualisation of relationships of features vs insurance charges
+**Interactive Exploratory Data Analysis (EDA)** focusing on the relationships between demographic features and insurance charges.
+Visualisations of features vs. charges (e.g., scatter plots, box plots).
 
 # Pairplot
-Pairplots of features to analyse relationships between features to check for collinearity 
+Displays **pairplots** of all relevant features to visually analyse relationships and check for **collinearity** between independent variables.
 
 # ML Model Evaluation
-This Page contains the accuracy metrics for the ML models and plots the predicted vs actual charges
+Presents **accuracy metrics** (e.g., $R^2, MSE, MAE) for all trained Machine Learning models.
 
 # K-fold Cross-Validation
-Cross-validation of ML models and analysis of scree-plot
-Interactive slider to observe the change in error metrics with a change in K
+Performs and visualizes **K-fold Cross-Validation** results to ensure model robustness.
+**Scree Plot** analysis and an **interactive slider** to observe how error metrics change with a change in the value of **K**
 
 
