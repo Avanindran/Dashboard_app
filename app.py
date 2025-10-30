@@ -262,6 +262,7 @@ MODELS1 = {
 #ML Model Evaluation Page
 
 def model_evaluation():
+    st.title("Base Model Evaluation without Hyperparameter Tuning")
     X = df.drop(columns=['charges', 'bmi'])
     y = df['charges']
     scaler = StandardScaler()
@@ -421,10 +422,7 @@ with st.spinner("Generating visualizations..."):
 
 
 def optimized_SVR_model():
-
-
-    st.subheader("SHAP Analysis for Feature Importance")
-
+    st.tile("Final SVR Model")
     med_data_final = raw.copy()
     med_data_final[["sex"]] = med_data_final[["sex"]].replace({"male":0, "female":1})
     med_data_final[["smoker"]] = med_data_final[["smoker"]].replace({"yes":1, "no":0})
