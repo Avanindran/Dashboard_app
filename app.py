@@ -462,7 +462,7 @@ def optimized_SVR_model():
         gamma_value = trial.suggest_float("gamma", 1e-2, 1e1, log=True)
 
         # Initialize KFold cross-validation
-        kf = KFold(n_splits=K, shuffle=True, random_state=42)
+        kf = KFold(n_splits=5, shuffle=True, random_state=42)
 
         mae_scores = []
 
