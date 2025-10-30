@@ -8,7 +8,8 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.pipeline import Pipeline
 from sklearn.decomposition import PCA
 from sklearn.svm import SVR
-
+import optuna
+import shap
 
 #Visualization Imports
 import matplotlib.pyplot as plt
@@ -413,6 +414,73 @@ with st.spinner("Generating visualizations..."):
 
 
 
+
+
+@st.cache_resource
+def optimized_SVR_model():
+
+
+    st.subheader("SHAP Analysis for Feature Importance")
+
+    med_data_final = raw.copy()
+    med_data_final[["sex"]] = med_data_final[["sex"]].replace({"male":0, "female":1})
+    med_data_final[["smoker"]] = med_data_final[["smoker"]].replace({"yes":1, "no":0})
+    med_data_final = med_data_final.drop(columns = ["region"])
+    X,y = med_data_final.drop(columns = ["charges"]), raw["charges"]
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, shuffle = True, random_state = 42)
+
+    X_final = med_data_final.drop(columns = ["charges"])
+    y_final = med_data_final["charges"]
+
+    # Split data for SHAP (using the final dataset)
+    X_train_final, X_test_final, y_train_final, y_test_final = train_test_split(
+        X_final, y_final, test_size=0.2, shuffle=True, random_state=42
+    )
+
+    # Scale features
+    scaler_final = StandardScaler()
+    X_train_scaled_final = scaler_final.fit_transform(X_train_final)
+    X_test_scaled_final = scaler_final.transform(X_test_final)
+
+    # Log transform target variable
+    y_train_log_final = np.log(y_train_final)
+
+
+    svr_final = SVR(kernel="rbf")
+    svr_final.fit(X_train_scaled_final, y_train_log_final)
+
+
+    X_background_sample = shap.utils.sample(X_train_scaled_final, 50) 
+
+
+    explainer = shap.KernelExplainer(svr_final.predict, X_background_sample)
+
+
+    X_predict_sample = shap.utils.sample(X_test_scaled_final, 50) 
+
+    shap_values = explainer.shap_values(X_predict_sample)
+
+
+
+    st.subheader("SHAP Summary Plot (on log scale)")
+
+    shap.summary_plot(shap_values, X_predict_sample, feature_names=X_test_final.columns)
+    st.pyplot(plt)
+
+    st.subheader("SHAP Dependence Plot (example for 'smoker', on log scale)")
+
+    smoker_col_index = X_test_final.columns.get_loc('smoker')
+    shap.dependence_plot(smoker_col_index, shap_values, X_predict_sample, feature_names=X_test_final.columns)
+    st.pyplot(plt)
+    
+    st.subheader("SHAP Force Plot (example for the first prediction, on log scale)")
+    # Force plot for the first instance
+    # The base value is the expected value of log(charges) over the background dataset
+    # The output value is the predicted log(charge) for the specific instance
+    shap.initjs() # Initialize JavaScript for interactive plots
+    shap.force_plot(explainer.expected_value, shap_values[0,:], features=X_predict_sample[0,:], feature_names=X_test_final.columns)
+    st.pyplot(plt)
+
 #Page Selection
 
 if selection == "Homepage (SDE)":
@@ -423,6 +491,8 @@ elif selection == "Pairwise Plots":
     pairwise_plots()
 elif selection == "K-Fold Cross Validation":
     CV_page()
+elif selection == "Optimized SVR Model":
+    optimized_SVR_model()
 
 
 
