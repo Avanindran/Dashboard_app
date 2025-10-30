@@ -111,13 +111,20 @@ def homepage():
     st.subheader("Relationship between each feature and charges")
     feature_selected = st.selectbox("Select Feature for Visualization", df.columns.drop('charges'))
      
-     
-    fig1, ax1 = plt.subplots(figsize = (7, 4))
-    ax1.set_title(f"Charges vs {feature_selected}")
-    ax1.set_xlabel(feature_selected)
-    ax1.set_ylabel("Charges ($)")
-    sns.scatterplot(x = feature_selected, y = 'charges', data = df, ax = ax1, alpha = 1.0, color = "orange")
-    st.pyplot(fig1)
+    if feature_selected == 'smoker', 'age', 'children', 'region':
+        fig, ax = plt.subplots(figsize = (7, 4))
+        ax.set_title (f"Charges vs {feature_selected}")
+        ax.set_xlabel(feature_selected)
+        ax.set_ylabel("Charges ($)")
+        sns.boxplot(x = feature_selected, y = 'charges', data = df, ax = ax, palette = "Set2")
+        st.pyplot(fig)
+    else:
+        fig1, ax1 = plt.subplots(figsize = (7, 4))
+        ax1.set_title(f"Charges vs {feature_selected}")
+        ax1.set_xlabel(feature_selected)
+        ax1.set_ylabel("Charges ($)")
+        sns.scatterplot(x = feature_selected, y = 'charges', data = df, ax = ax1, alpha = 1.0, color = "orange")
+        st.pyplot(fig1)
 
     fig, ax = plt.subplots(1, 3, figsize = (10, 4))
     ax[0].hist(raw["age"], bins = 20, color = 'skyblue', edgecolor = 'black')
@@ -314,8 +321,6 @@ def model_evaluation():
         ax2.set_title(f'Feature Importances from {selected_model} Model')
         plt.tight_layout()
         st.pyplot(fig2)
-
-
 
 
 
