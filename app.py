@@ -193,7 +193,8 @@ def pairwise_plots():
     st.pyplot(plt)
     st.subheader("Figure 4: Pairwise Relationships Hued by CHILDREN")
     sns.pairplot(
-        data.drop(columns=['children']),
+        data,
+        vars = ['age', 'bmi', 'charges'],
         height=PLOT_HEIGHT,
         hue="children",
         diag_kind="kde",
