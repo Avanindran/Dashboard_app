@@ -126,6 +126,7 @@ def homepage():
         sns.scatterplot(x = feature_selected, y = 'charges', data = df, ax = ax1, alpha = 1.0, color = "orange")
         st.pyplot(fig1)
 
+    st.subheader("Distributions of Key Numerical Variables")
     fig, ax = plt.subplots(1, 3, figsize = (10, 4))
     ax[0].hist(raw["age"], bins = 20, color = 'skyblue', edgecolor = 'black')
     ax[0].set_title("Age Distribution")
