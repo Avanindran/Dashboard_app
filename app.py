@@ -197,7 +197,6 @@ def pairwise_plots():
         vars = ['age', 'bmi', 'charges'],
         height=PLOT_HEIGHT,
         hue="children",
-        palette="viridis",
         diag_kind="kde",
         plot_kws={'alpha': 0.6, 's': 20}
     )
