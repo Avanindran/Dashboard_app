@@ -111,7 +111,7 @@ def homepage():
     st.subheader("Relationship between each feature and charges")
     feature_selected = st.selectbox("Select Feature for Visualization", df.columns.drop('charges'))
      
-    if feature_selected == 'smoker', 'age', 'children', 'region':
+    if feature_selected in ['smoker', 'age', 'children', 'region']:
         fig, ax = plt.subplots(figsize = (7, 4))
         ax.set_title (f"Charges vs {feature_selected}")
         ax.set_xlabel(feature_selected)
