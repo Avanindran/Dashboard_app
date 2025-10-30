@@ -159,14 +159,14 @@ def pairwise_plots():
     data = raw
     PLOT_HEIGHT = 2.0
     st.subheader("Figure 1: Pairwise Relationships Hued by SMOKER Status ")
-    sns.pairplot(
+    g1 = sns.pairplot(
         data.drop(columns=['children']),
         height=PLOT_HEIGHT,
         hue="smoker",
         diag_kind="kde",
         plot_kws={'alpha': 0.6, 's': 20}
     )
-    st.pyplot(plt)
+    st.pyplot(g1)
 
     st.subheader("Figure 2: Pairwise Relationships Hued by SEX")
     sns.pairplot(
