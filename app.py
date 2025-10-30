@@ -166,9 +166,8 @@ def pairwise_plots():
         diag_kind="kde",
         plot_kws={'alpha': 0.6, 's': 20}
     )
-    # plt.suptitle("Pairwise Relationships of Medical Data, Colored by Smoker Status",
-    #             y=1.02)
     st.pyplot(plt)
+
     st.subheader("Figure 2: Pairwise Relationships Hued by SEX")
     sns.pairplot(
         data.drop(columns=['children']),
