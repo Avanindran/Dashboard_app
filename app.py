@@ -450,7 +450,7 @@ def optimized_SVR_model():
     svr_final = SVR(kernel="rbf")
     svr_final.fit(X_train_scaled_final, y_train_log_final)
 
-    @st.cache_data
+    @st.cache_resource
     def objective(trial):
         # Define hyperparameters to tune
         # C is the regularization parameter. Smaller values specify stronger regularization.
