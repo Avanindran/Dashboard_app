@@ -84,7 +84,8 @@ PAGE_OPTIONS = {
     "Homepage (SDE)": "homepage",
     "Model Evaluation": "model_evaluation",
     "Pairwise Plots": "pairwise_plots",
-    "K-Fold Cross Validation": "CV_page"
+    "K-Fold Cross Validation": "CV_page",
+    "Optimized SVR Model": "optimized_SVR_model"
 }
 
 with st.sidebar:
