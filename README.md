@@ -14,7 +14,7 @@ Visualisations of features vs. charges (e.g., scatter plots, box plots).
 Displays **pairplots** of all relevant features to visually analyse relationships and check for **collinearity** between independent variables.
 
 # ML Model Evaluation
-Presents **accuracy metrics** (e.g.R^2, MSE, MAE) for all trained Machine Learning models.
+Presents **evaluation metrics** (e.g.MSE, MAE) for all trained Machine Learning models.
 
 # K-fold Cross-Validation
 Performs and visualizes **K-fold Cross-Validation** results to ensure model robustness.
