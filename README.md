@@ -1,6 +1,6 @@
 
 
-# 📈 ML Insurance Charges Prediction Dashboard
+# ML Insurance Charges Prediction Dashboard
 A comprehensive Streamlit dashboard designed to analyse insurance charge data, visualise key feature relationships, and evaluate various Machine Learning models for predicting individual medical costs.
 
 # Dependencies required
