@@ -195,11 +195,11 @@ def pairwise_plots():
     sns.pairplot(
         data.drop(columns=['children']),
         height=PLOT_HEIGHT,
-        hue="region",
+        hue="children",
         diag_kind="kde",
         plot_kws={'alpha': 0.6, 's': 20}
     )
-    plt.suptitle("Pairwise Relationships of Medical Data, Colored by Region",
+    plt.suptitle("Pairwise Relationships of Medical Data, Colored by Number of Children",
                 y=1.02)
     st.pyplot(plt)
 
