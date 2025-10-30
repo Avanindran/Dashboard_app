@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split, KFold, cross_val_score
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression, Lasso
 from sklearn.metrics import mean_absolute_percentage_error,r2_score, root_mean_squared_error, mean_absolute_error, mean_squared_error
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.pipeline import Pipeline
@@ -10,6 +10,10 @@ from sklearn.decomposition import PCA
 from sklearn.svm import SVR
 import optuna
 import shap
+from IPython.display import display
+from sklearn.feature_selection import RFECV, SequentialFeatureSelector
+from mlxtend.feature_selection import ExhaustiveFeatureSelector as EFS
+from xgboost import XGBRegressor
 
 #Visualization Imports
 import matplotlib.pyplot as plt
@@ -417,7 +421,7 @@ with st.spinner("Generating visualizations..."):
 
 
 
-@st.cache_resource
+
 def optimized_SVR_model():
 
 
@@ -468,7 +472,7 @@ def optimized_SVR_model():
     shap.summary_plot(shap_values, X_predict_sample, feature_names=X_test_final.columns)
     st.pyplot(plt)
 
-    st.subheader("SHAP Dependence Plot (example for 'smoker', on log scale)")
+    st.subheader("SHAP Dependence Plot ")
 
     smoker_col_index = X_test_final.columns.get_loc('smoker')
     shap.dependence_plot(smoker_col_index, shap_values, X_predict_sample, feature_names=X_test_final.columns)
