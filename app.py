@@ -9,8 +9,6 @@ from sklearn.pipeline import Pipeline
 from sklearn.decomposition import PCA
 from sklearn.svm import SVR
 import optuna
-import shap
-from IPython.display import display
 from sklearn.feature_selection import RFECV, SequentialFeatureSelector
 from mlxtend.feature_selection import ExhaustiveFeatureSelector as EFS
 from xgboost import XGBRegressor
@@ -454,37 +452,125 @@ def optimized_SVR_model():
     svr_final = SVR(kernel="rbf")
     svr_final.fit(X_train_scaled_final, y_train_log_final)
 
+    def objective(trial):
+        # Define hyperparameters to tune
+        # C is the regularization parameter. Smaller values specify stronger regularization.
+        c_value = trial.suggest_float("C", 1e-2, 1e2, log=True)
+        # epsilon in the epsilon-SVR model. It specifies the epsilon-tube within which no penalty is associated in the training loss function.
+        epsilon_value = trial.suggest_float("epsilon", 1e-3, 1e-1, log=True)
+        # gamma is the kernel coefficient for 'rbf', 'poly' and 'sigmoid'.
+        gamma_value = trial.suggest_float("gamma", 1e-2, 1e1, log=True)
 
-    X_background_sample = shap.utils.sample(X_train_scaled_final, 50) 
+        # Initialize KFold cross-validation
+        kf = KFold(n_splits=K, shuffle=True, random_state=42)
+
+        mae_scores = []
+
+        # Loop through each fold
+        for train_index, val_index in kf.split(X_train_final):
+            X_train_fold, X_val_fold = X_train_final.iloc[train_index], X_train_final.iloc[val_index]
+            # Use log-transformed target for training the model
+            y_train_fold_log = np.log(y_train_final.iloc[train_index])
+            # Keep original scale for validation set for MAE calculation
+            y_val_fold = y_train_final.iloc[val_index]
 
 
-    explainer = shap.KernelExplainer(svr_final.predict, X_background_sample)
+            # Scale features for the current fold
+            scaler_fold = StandardScaler()
+            X_train_scaled_fold = scaler_fold.fit_transform(X_train_fold)
+            X_val_scaled_fold = scaler_fold.transform(X_val_fold)
+
+            # Initialize and train SVR model with trial hyperparameters
+            model = SVR(C=c_value, epsilon=epsilon_value, gamma=gamma_value, kernel='rbf')
+            model.fit(X_train_scaled_fold, y_train_fold_log) # Fit on log-transformed target
+
+            # Predict on the validation set (log scale)
+            y_pred_log = model.predict(X_val_scaled_fold)
+
+            # Inverse transform predictions to the original scale to calculate MAE
+            y_pred = np.exp(y_pred_log)
+
+            # Calculate MAE on the original scale
+            mae = mean_absolute_error(y_val_fold, y_pred)
+            mae_scores.append(mae)
+
+        # Return the average MAE across all folds
+        return np.mean(mae_scores)
+
+    study = optuna.create_study(direction="minimize")
+
+    # Run the optimization
+    # n_trials is the number of hyperparameter combinations to try. You can adjust this number.
+    study.optimize(objective, n_trials=100)
 
 
-    X_predict_sample = shap.utils.sample(X_test_scaled_final, 50) 
 
-    shap_values = explainer.shap_values(X_predict_sample)
+    # Store the best hyperparameters
+    best_params = study.best_trial.params
 
+    scaler_final = StandardScaler()
+    X_train_scaled_final = scaler_final.fit_transform(X_train_final)
+    X_test_scaled_final = scaler_final.transform(X_test_final)
 
+    # Log transform target variable for training
+    y_train_log_final = np.log(y_train_final)
 
-    st.subheader("SHAP Summary Plot (on log scale)")
+    # Initialize and train SVR model with the best hyperparameters
+    # The best_params dictionary was stored from the Optuna study
+    optimized_svr = SVR(kernel='rbf', **best_params)
+    optimized_svr.fit(X_train_scaled_final, y_train_log_final)
 
-    shap.summary_plot(shap_values, X_predict_sample, feature_names=X_test_final.columns)
+    # Predict on the scaled test set (log scale)
+    y_pred_log_test = optimized_svr.predict(X_test_scaled_final)
+
+    # Inverse transform predictions to the original scale
+    y_pred_test = np.exp(y_pred_log_test)
+
+    # Evaluate the model on the original scale of the test set
+    mae_test = mean_absolute_error(y_test_final, y_pred_test)
+    rmse_test = root_mean_squared_error(y_test_final, y_pred_test)
+    mape_test = mean_absolute_percentage_error(y_test_final, y_pred_test)
+
+    st.subheader("Final SVR Model Evaluation on Test Set with Optimized Hyperparameters")
+    st.write(f"MAE on Test Set: {mae_test:.4f}")
+    st.write(f"RMSE on Test Set: {rmse_test:.4f}")
+    st.write(f"MAPE on Test Set: {mape_test:.4f}")
+
+    plt.style.use('seaborn-v0_8-whitegrid') # Using a seaborn style with a grid
+
+    # Plotting predictions against actual values
+    plt.figure(figsize=(8, 4))
+    plt.scatter(y_test_final, y_pred_test, alpha=0.6, color='teal', s=30) # Changed color to teal, increased marker size
+    plt.plot([y_test_final.min(), y_test_final.max()], [y_test_final.min(), y_test_final.max()], 'salmon', lw=2, label='Ideal Fit') # Changed line color to salmon, added label
+    plt.xlabel("Actual Charges ($)", fontsize=12) # Increased font size for labels
+    plt.ylabel("Predicted Charges ($)", fontsize=12) # Increased font size for labels
+    plt.title("Actual vs. Predicted Insurance Charges (Optimized SVR)", fontsize=14, fontweight='bold') # Increased font size and made title bold
+    plt.legend() # Added legend
+    plt.grid(True, linestyle='--', alpha=0.6) # Added grid with dashed lines and transparency
+    plt.tight_layout() # Adjust layout to prevent labels overlapping
     st.pyplot(plt)
 
-    st.subheader("SHAP Dependence Plot ")
+    # Plotting residuals
+    residuals = y_test_final - y_pred_test
+    plt.figure(figsize=(8, 4))
+    sns.histplot(residuals, kde=True, color='purple', bins=30) # Changed color to purple, adjusted bins
+    plt.xlabel("Residuals (Actual - Predicted) ($)", fontsize=12) # Increased font size for labels
+    plt.ylabel("Frequency", fontsize=12) # Increased font size for labels
+    plt.title("Distribution of Residuals (Optimized SVR)", fontsize=14, fontweight='bold') # Increased font size and made title bold
+    plt.grid(True, linestyle='--', alpha=0.6) # Added grid with dashed lines and transparency
+    plt.tight_layout() # Adjust layout to prevent labels overlapping
+    st.pyplot(plt)
 
-    smoker_col_index = X_test_final.columns.get_loc('smoker')
-    shap.dependence_plot(smoker_col_index, shap_values, X_predict_sample, feature_names=X_test_final.columns)
+    plt.figure(figsize=(8, 4))
+    plt.scatter(y_pred_test, residuals, alpha=0.6, color='darkorange', s=30) # Changed color to darkorange, increased marker size
+    plt.xlabel("Predicted Charges ($)", fontsize=12) # Increased font size for labels
+    plt.ylabel("Residuals ($)", fontsize=12) # Increased font size for labels
+    plt.title("Residuals vs. Predicted Charges (Optimized SVR)", fontsize=14, fontweight='bold') # Increased font size and made title bold
+    plt.axhline(y=0, color='gray', linestyle='--', lw=2) # Changed line color to gray, added dashed line
+    plt.grid(True, linestyle='--', alpha=0.6) # Added grid with dashed lines and transparency
+    plt.tight_layout() # Adjust layout to prevent labels overlapping
     st.pyplot(plt)
-    
-    st.subheader("SHAP Force Plot (example for the first prediction, on log scale)")
-    # Force plot for the first instance
-    # The base value is the expected value of log(charges) over the background dataset
-    # The output value is the predicted log(charge) for the specific instance
-    shap.initjs() # Initialize JavaScript for interactive plots
-    shap.force_plot(explainer.expected_value, shap_values[0,:], features=X_predict_sample[0,:], feature_names=X_test_final.columns)
-    st.pyplot(plt)
+
 
 #Page Selection
 
