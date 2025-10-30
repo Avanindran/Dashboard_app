@@ -420,7 +420,7 @@ with st.spinner("Generating visualizations..."):
 
 
 
-
+@st.cache_resource
 def optimized_SVR_model():
     st.title("Final SVR Model")
     med_data_final = raw.copy()
