@@ -422,7 +422,7 @@ with st.spinner("Generating visualizations..."):
 
 
 def optimized_SVR_model():
-    st.tile("Final SVR Model")
+    st.title("Final SVR Model")
     med_data_final = raw.copy()
     med_data_final[["sex"]] = med_data_final[["sex"]].replace({"male":0, "female":1})
     med_data_final[["smoker"]] = med_data_final[["smoker"]].replace({"yes":1, "no":0})
